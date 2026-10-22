@@ -147,14 +147,27 @@ function HomePage() {
                   "Маңызды тексеру.\nАртық күтусіз.",
                 )}
               </p>
-              <Link to="/book">
-                {copy("Выбрать время", "Уақыт таңдау")}
+              <Link to="/screening">
+                {copy("Как проходит скрининг", "Скрининг қалай өтеді")}
                 <SmartIcon name="arrow" size={20} />
               </Link>
             </div>
             <ScreeningArtwork />
           </section>
         </div>
+        <Link to="/notifications" className="home-reminder-link">
+          <SmartIcon name="bell" size={30} />
+          <span>
+            <b>{copy("Не пропустите заботу о себе", "Өзіңізге қамқорлықты ұмытпаңыз")}</b>
+            <small>
+              {copy(
+                "Напоминания за 72, 24 и 2 часа · подтверждение и перенос",
+                "72, 24 және 2 сағат бұрын еске салу · растау және ауыстыру",
+              )}
+            </small>
+          </span>
+          <SmartIcon name="arrow" size={22} />
+        </Link>
         <Link to="/more" className="health-all-services">
           <SmartIcon name="more" size={25} />
           <span>{copy("Все разделы", "Барлық бөлімдер")}</span>

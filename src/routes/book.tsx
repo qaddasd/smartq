@@ -7,6 +7,7 @@ import { centers } from "@/lib/centers";
 import { useStore } from "@/lib/store";
 import { appointmentTime, canBook, nextDates, services, timeSlots } from "@/lib/visits";
 import { useClock } from "@/hooks/use-clock";
+import { VisitReminders } from "@/components/VisitReminders";
 export const Route = createFileRoute("/book")({
   validateSearch: z.object({ center: z.string().optional(), edit: z.string().optional() }),
   component: Booking,
@@ -100,6 +101,17 @@ function BookingForm({
             <ArrowRight size={16} />
           </Button>
         </Card>
+        <div className="mx-auto mt-5 max-w-2xl">
+          <VisitReminders
+            visit={state.visits.find(
+              (v) =>
+                v.centerId === centerId &&
+                v.date === date &&
+                v.time === time &&
+                v.status === "booked",
+            )}
+          />
+        </div>
       </Screen>
     );
   return (
@@ -269,6 +281,12 @@ function BookingForm({
               "Оқу кестесі. Жазылу клиникадағы нақты қабылдауды брондамайды.",
             )}
           </p>
+          <Link to="/screening" className="muted-link mt-4">
+            {copy(
+              "Как проходит скрининг и как подготовиться →",
+              "Скрининг қалай өтеді және қалай дайындалу керек →",
+            )}
+          </Link>
         </aside>
       </div>
     </Screen>

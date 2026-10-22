@@ -1371,3 +1371,461 @@ select option {
     transform: none;
   }
 }
+
+/* Patient preparation, attendance support and the camera scanner. */
+.reminders-card {
+  padding: 24px;
+}
+.reminders-heading {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.reminders-heading h2 {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.reminders-heading p,
+.reminder-explanation {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+  margin-top: 8px;
+}
+.reminder-stages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 22px 0;
+}
+.reminder-stages > div {
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 15px 12px;
+  background: var(--secondary);
+}
+.reminder-stages b {
+  font-size: 26px;
+  letter-spacing: -1px;
+  color: var(--primary);
+  display: block;
+}
+.reminder-stages span {
+  font-size: 12px;
+  display: block;
+  margin-top: 2px;
+}
+.reminder-stages small {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  display: block;
+  margin-top: 10px;
+}
+.reminder-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.reminder-toggle input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.reminder-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.reminder-buttons button {
+  flex: 1;
+  min-width: 185px;
+}
+.reminder-message {
+  padding: 20px;
+  background: var(--secondary);
+  border: 1px solid var(--primary);
+  border-radius: 18px;
+  margin-top: 20px;
+}
+.reminder-message > span {
+  font-size: 11px;
+  color: var(--primary);
+}
+.reminder-message h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 10px 0;
+}
+.reminder-message p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.reminder-response-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.reminder-response-buttons button,
+.reminder-response-buttons a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-height: 42px;
+  padding: 9px 12px;
+  font-size: 13px;
+  background: var(--card);
+  color: var(--primary);
+}
+.reminder-response-buttons button:disabled {
+  opacity: 0.6;
+}
+.reminder-channels {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 15px;
+  color: var(--muted-foreground);
+}
+.reminder-channels svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.reminder-channels p {
+  font-size: 12px;
+  line-height: 1.65;
+}
+.home-reminder-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 22px 24px;
+  margin: 20px 0;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--card);
+}
+.home-reminder-link > svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+.home-reminder-link span {
+  flex: 1;
+  min-width: 0;
+}
+.home-reminder-link b {
+  display: block;
+  font-size: 17px;
+  font-weight: 500;
+}
+.home-reminder-link small {
+  display: block;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.screening-guide-hero {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  align-items: center;
+  gap: 22px;
+  padding: 34px;
+  border-radius: 26px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.screening-guide-hero h2 {
+  font-size: clamp(23px, 3vw, 35px);
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 16px 0;
+  max-width: 560px;
+}
+.screening-guide-hero p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+  max-width: 570px;
+}
+.screening-guide-hero > svg {
+  position: static;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  max-width: 320px;
+  justify-self: center;
+}
+.screening-guide-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+.screening-guide-facts > .sq-card,
+.screening-procedures > .sq-card,
+.screening-guide-bottom > .sq-card {
+  padding: 25px;
+}
+.screening-guide-facts svg {
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+.screening-guide-facts h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 9px;
+}
+.screening-guide-facts p,
+.screening-procedures p,
+.screening-guide-bottom p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+}
+.guide-section-title {
+  font-size: 23px;
+  font-weight: 600;
+  margin: 35px 0 18px;
+}
+.screening-procedures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.procedure-number {
+  font-size: 13px;
+  color: var(--primary);
+  letter-spacing: 2px;
+}
+.screening-procedures h3 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 12px 0;
+}
+.procedure-time {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--primary);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.screening-procedures details {
+  border-top: 1px solid var(--border);
+  padding-top: 15px;
+  margin: 18px 0;
+}
+.screening-procedures summary {
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 0;
+  color: var(--foreground);
+}
+.screening-procedures details p {
+  margin-top: 8px;
+}
+.guide-source {
+  font-size: 12px;
+  color: var(--primary);
+  display: inline-block;
+  margin-top: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.screening-guide-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 22px;
+}
+.screening-guide-bottom h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.guide-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 12px 0;
+}
+.guide-check svg {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.scanner-page {
+  position: relative;
+  isolation: isolate;
+  background: #090f12;
+  color: #f3f7f6;
+  min-height: calc(100dvh - 90px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.scanner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(#090f12cc, transparent);
+}
+.scanner-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.scanner-header a {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #101a1ddd;
+}
+.scanner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 22px;
+  min-height: 400px;
+}
+.scanner-frame {
+  position: relative;
+  width: min(260px, 70vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 3px solid #63d3b3;
+  border-radius: 26px;
+  box-shadow: 0 0 0 999px #050b1099;
+  color: #76d7bd;
+}
+.scanner-line {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 15px;
+  height: 2px;
+  background: #76d7bd;
+}
+.scanner-status {
+  position: relative;
+  z-index: 1;
+  max-width: 440px;
+  text-align: center;
+  margin-top: 30px;
+}
+.scanner-status h2 {
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.scanner-status p {
+  font-size: 13px;
+  color: #b7c7c4;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+.scanner-actions {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scanner-manual {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  color: #76d7bd;
+  font-size: 14px;
+}
+.scanner-actions > p {
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+  color: #b7c7c4;
+}
+@media (max-width: 900px) {
+  .screening-procedures,
+  .screening-guide-facts {
+    grid-template-columns: 1fr;
+  }
+  .screening-guide-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .screening-guide-hero {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+  .screening-guide-hero > svg {
+    max-height: 190px;
+  }
+  .reminders-card {
+    padding: 19px;
+  }
+  .reminders-heading {
+    gap: 10px;
+  }
+  .reminders-heading h2 {
+    font-size: 18px;
+  }
+  .reminder-stages {
+    gap: 7px;
+  }
+  .reminder-stages > div {
+    padding: 13px 9px;
+  }
+  .reminder-stages b {
+    font-size: 23px;
+  }
+  .home-reminder-link {
+    padding: 19px 16px;
+    gap: 10px;
+  }
+  .home-reminder-link b {
+    font-size: 16px;
+  }
+  .scanner-page {
+    min-height: calc(100dvh - 160px);
+    border-radius: 0;
+  }
+  .scanner-content {
+    min-height: 350px;
+  }
+}

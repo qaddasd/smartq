@@ -8,10 +8,12 @@ export interface Visit {
   time: string;
   status: VisitStatus;
   createdAt: number;
+  scheduledAt?: number;
   completedAt?: number;
   revision?: number;
   remindedFor?: string;
   confirmedAt?: number;
+  attendanceReminded?: string[];
 }
 export const services = [
   {
@@ -112,4 +114,22 @@ export function reminderDue(visit: Visit, leadMinutes: number, now = Date.now())
     remaining <= leadMinutes * 60000 &&
     visit.remindedFor !== reminderKey(visit)
   );
+}
+
+export const attendanceReminderHours = [72, 24, 2] as const;
+export function attendanceSchedule(visit: Visit) {
+  const start = appointmentTime(visit.date, visit.time);
+  return attendanceReminderHours.map((hours) => ({
+    hours,
+    at: start - hours * 3600000,
+    key: `${reminderKey(visit)}:${hours}`,
+  }));
+}
+/** Catch up only the latest eligible reminder, never a burst of old messages. */
+export function attendanceReminderDue(visit: Visit, now = Date.now()) {
+  if (visit.status !== "booked" || appointmentTime(visit.date, visit.time) <= now) return null;
+  const latest = attendanceSchedule(visit)
+    .filter((item) => item.at >= (visit.scheduledAt ?? visit.createdAt) && item.at <= now)
+    .at(-1);
+  return latest && !visit.attendanceReminded?.includes(latest.key) ? latest : null;
 }

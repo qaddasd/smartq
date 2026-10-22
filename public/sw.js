@@ -1,5 +1,5 @@
 /* Cache only the demo UI. API and server-function requests always use the network. */
-const VERSION = "smartq-ui-v2.1.0";
+const VERSION = "smartq-ui-v2.2.0";
 self.addEventListener("install", (event) =>
   event.waitUntil(
     caches

@@ -1,6 +1,6 @@
 import type { Lang } from "./i18n";
 import { getCenter } from "./centers.ts";
-import { appointmentTime, services, type Visit } from "./visits.ts";
+import { appointmentTime, services, attendanceReminderHours, type Visit } from "./visits.ts";
 
 /** RFC 5545 TEXT escaping and UTF-8-safe content line folding. */
 export function calendarText(value: string) {
@@ -66,6 +66,17 @@ export function visitCalendar(
     [5, 10, 15].includes(reminderMinutes) &&
     visit.status !== "cancelled"
   ) {
+    for (const hours of attendanceReminderHours) {
+      // Do not import already expired alerts into the patient's calendar.
+      if (start - hours * 3600000 <= now) continue;
+      lines.push(
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        `TRIGGER:-PT${hours}H`,
+        `DESCRIPTION:${calendarText(title)}`,
+        "END:VALARM",
+      );
+    }
     lines.push(
       "BEGIN:VALARM",
       "ACTION:DISPLAY",

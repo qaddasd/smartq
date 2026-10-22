@@ -11,7 +11,15 @@ import {
 import { type Lang, type TKey, translate, plural } from "./i18n";
 import { getCenter } from "./centers";
 import { estimateTicketWait } from "./queue-model";
-import { canBook, canCheckIn, services, reminderDue, reminderKey, type Visit } from "./visits";
+import {
+  canBook,
+  canCheckIn,
+  services,
+  reminderDue,
+  reminderKey,
+  attendanceReminderDue,
+  type Visit,
+} from "./visits";
 
 import { advanceTicket, delayTicket, type QueueTicket, type QueueStatus } from "./queue-state";
 export type Ticket = QueueTicket;
@@ -25,6 +33,7 @@ export interface AppNotification {
   body?: Record<Lang, string>;
   time: number;
   read: boolean;
+  visitId?: string;
 }
 export interface Settings {
   push: boolean;
@@ -75,6 +84,7 @@ function notify(
   title: Record<Lang, string>,
   body: Record<Lang, string>,
   id: string = makeId(),
+  visitId?: string,
 ): AppState {
   if (state.notifications.some((n) => n.id === id)) return state;
   return {
@@ -88,6 +98,7 @@ function notify(
         body,
         time: Date.now(),
         read: false,
+        ...(visitId ? { visitId } : {}),
       },
       ...state.notifications,
     ].slice(0, 80),
@@ -273,7 +284,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!p.settings.reminders) return p;
         const now = Date.now();
         const due = p.visits.filter((v) => reminderDue(v, p.settings.remindBefore, now));
-        if (!due.length) return p;
+        const attendance = p.visits.flatMap((visit) => {
+          const reminder = attendanceReminderDue(visit, now);
+          return reminder ? [{ visit, reminder }] : [];
+        });
+        if (!due.length && !attendance.length) return p;
         let next = {
           ...p,
           visits: p.visits.map((v) =>
@@ -290,6 +305,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               kk: `${v.time} · ${center.name.kk}. Келгеніңізді растау үшін қабылдауды ашыңыз.`,
             },
             `reminder:${v.id}:${reminderKey(v)}`,
+            v.id,
+          );
+        }
+        for (const { visit, reminder } of attendance) {
+          next = {
+            ...next,
+            visits: next.visits.map((v) =>
+              v.id === visit.id
+                ? { ...v, attendanceReminded: [...(v.attendanceReminded ?? []), reminder.key] }
+                : v,
+            ),
+          };
+          const center = getCenter(visit.centerId)!;
+          next = notify(
+            next,
+            { ru: "Напоминаем о вашем визите", kk: "Қабылдауыңызды еске саламыз" },
+            {
+              ru: `${visit.date} в ${visit.time} · ${center.name.ru}. Пожалуйста, приходите. Подтвердите визит или выберите другое время.`,
+              kk: `${visit.date}, ${visit.time} · ${center.name.kk}. Қабылдауға келуіңізді сұраймыз. Келетініңізді растаңыз немесе басқа уақытты таңдаңыз.`,
+            },
+            `attendance:${visit.id}:${reminder.key}`,
+            visit.id,
           );
         }
         return next;
@@ -450,6 +487,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           time,
           status: "booked",
           createdAt: previous?.createdAt ?? Date.now(),
+          scheduledAt: Date.now(),
           revision: previous ? (previous.revision ?? 0) + 1 : 0,
         };
         commit((current) =>
@@ -493,15 +531,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return notify(
             {
               ...p,
-              visits: p.visits.map((v) =>
-                v.id === id ? { ...v, confirmedAt: Date.now() } : v,
-              ),
+              visits: p.visits.map((v) => (v.id === id ? { ...v, confirmedAt: Date.now() } : v)),
             },
             { ru: "Визит подтверждён", kk: "Қабылдау расталды" },
             {
               ru: "Спасибо! Мы напомним о скрининге перед приёмом.",
               kk: "Рақмет! Скрининг алдында еске саламыз.",
             },
+          );
+        }),
+      previewVisitReminder: (id: string) =>
+        commit((p) => {
+          const visit = p.visits.find((v) => v.id === id && v.status === "booked");
+          if (!visit) return p;
+          const center = getCenter(visit.centerId)!;
+          return notify(
+            p,
+            { ru: "Пример напоминания · в приложении", kk: "Еске салу үлгісі · қолданбада" },
+            {
+              ru: `${visit.date} в ${visit.time} · ${center.name.ru}. Пожалуйста, приходите на скрининг. Если планы изменились, перенесите или отмените запись.`,
+              kk: `${visit.date}, ${visit.time} · ${center.name.kk}. Скринингке келуіңізді сұраймыз. Жоспарыңыз өзгерсе, уақытты ауыстырыңыз немесе жазылуды тоқтатыңыз.`,
+            },
+            makeId(),
+            visit.id,
           );
         }),
       markAllRead: () =>
@@ -551,6 +603,7 @@ interface StoreApi {
   ) => boolean;
   cancelVisit: (id: string) => void;
   confirmVisit: (id: string) => void;
+  previewVisitReminder: (id: string) => void;
   markAllRead: () => void;
   clearNotifications: () => void;
   updateSettings: (patch: Partial<Settings>) => void;

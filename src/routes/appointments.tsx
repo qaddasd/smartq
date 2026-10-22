@@ -7,6 +7,7 @@ import { getCenter } from "@/lib/centers";
 import { appointmentTime, canCheckIn, services } from "@/lib/visits";
 import { downloadVisitCalendar } from "@/lib/calendar";
 import { useClock } from "@/hooks/use-clock";
+import { VisitReminders } from "@/components/VisitReminders";
 export const Route = createFileRoute("/appointments")({ component: Appointments });
 function Appointments() {
   const { state, copy, cancelVisit, confirmVisit, issueTicket, hydrated } = useStore();
@@ -275,6 +276,15 @@ function Appointments() {
               </Card>
             );
           })}
+        </div>
+      )}
+      {tab === "upcoming" && hydrated && (
+        <div className="mt-6">
+          <VisitReminders
+            visit={visits.find(
+              (v) => v.status === "booked" && appointmentTime(v.date, v.time) > now,
+            )}
+          />
         </div>
       )}
       <p className="demo-note mt-6">

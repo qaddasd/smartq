@@ -24,6 +24,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectRouteImport } from './routes/project'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScanRouteImport } from './routes/scan'
+import { Route as ScreeningRouteImport } from './routes/screening'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as CenterIdRouteImport } from './routes/center.$id'
 
@@ -102,6 +103,11 @@ const ScanRoute = ScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScreeningRoute = ScreeningRouteImport.update({
+  id: '/screening',
+  path: '/screening',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/project': typeof ProjectRoute
   '/queue': typeof QueueRoute
   '/scan': typeof ScanRoute
+  '/screening': typeof ScreeningRoute
   '/staff': typeof StaffRoute
   '/center/$id': typeof CenterIdRoute
 }
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/project': typeof ProjectRoute
   '/queue': typeof QueueRoute
   '/scan': typeof ScanRoute
+  '/screening': typeof ScreeningRoute
   '/staff': typeof StaffRoute
   '/center/$id': typeof CenterIdRoute
 }
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/project': typeof ProjectRoute
   '/queue': typeof QueueRoute
   '/scan': typeof ScanRoute
+  '/screening': typeof ScreeningRoute
   '/staff': typeof StaffRoute
   '/center/$id': typeof CenterIdRoute
 }
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/project'
     | '/queue'
     | '/scan'
+    | '/screening'
     | '/staff'
     | '/center/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/project'
     | '/queue'
     | '/scan'
+    | '/screening'
     | '/staff'
     | '/center/$id'
   id:
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/project'
     | '/queue'
     | '/scan'
+    | '/screening'
     | '/staff'
     | '/center/$id'
   fileRoutesById: FileRoutesById
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   ProjectRoute: typeof ProjectRoute
   QueueRoute: typeof QueueRoute
   ScanRoute: typeof ScanRoute
+  ScreeningRoute: typeof ScreeningRoute
   StaffRoute: typeof StaffRoute
   CenterIdRoute: typeof CenterIdRoute
 }
@@ -358,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/screening': {
+      id: '/screening'
+      path: '/screening'
+      fullPath: '/screening'
+      preLoaderRoute: typeof ScreeningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/staff': {
       id: '/staff'
       path: '/staff'
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectRoute: ProjectRoute,
   QueueRoute: QueueRoute,
   ScanRoute: ScanRoute,
+  ScreeningRoute: ScreeningRoute,
   StaffRoute: StaffRoute,
   CenterIdRoute: CenterIdRoute,
 }

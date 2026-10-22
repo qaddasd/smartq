@@ -13,6 +13,7 @@ function More() {
     {
       title: copy("Для вашего здоровья", "Сіздің денсаулығыңыз үшін"),
       items: [
+        { to: "/screening", icon: "shield", label: copy("О скрининге без тревоги", "Скрининг туралы") },
         { to: "/book", icon: "booking", label: copy("Запись на приём", "Қабылдауға жазылу") },
         {
           to: "/appointments",

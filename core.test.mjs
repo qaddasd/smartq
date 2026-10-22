@@ -195,3 +195,38 @@ test("persisted reminder identity prevents repeat delivery; rescheduling gets a 
   const moved = { ...delivered, time: "11:00" };
   assert.equal(reminderDue(moved, 10, appointmentTime(moved.date, moved.time) - 60000), true);
 });
+
+const { attendanceSchedule, attendanceReminderDue } = await import("./src/lib/visits.ts");
+test("attendance reminders respect booking date, latest stage and persistent delivery", () => {
+  const at = appointmentTime(visit.date, visit.time);
+  const booked = { ...visit, createdAt: at - 96 * 3600000 };
+  const stages = attendanceSchedule(booked);
+  assert.deepEqual(
+    stages.map((s) => s.hours),
+    [72, 24, 2],
+  );
+  assert.equal(attendanceReminderDue(booked, at - 73 * 3600000), null);
+  assert.equal(attendanceReminderDue(booked, at - 71 * 3600000).hours, 72);
+  assert.equal(attendanceReminderDue(booked, at - 20 * 3600000).hours, 24);
+  const sent = { ...booked, attendanceReminded: [stages[1].key] };
+  assert.equal(attendanceReminderDue(sent, at - 20 * 3600000), null);
+  assert.equal(attendanceReminderDue(sent, at - 3600000).hours, 2);
+  assert.equal(
+    attendanceReminderDue({ ...booked, scheduledAt: at - 3 * 3600000 }, at - 2.5 * 3600000),
+    null,
+  );
+  assert.equal(attendanceReminderDue({ ...booked, createdAt: at - 3600000 }, at - 1800000), null);
+  for (const status of ["cancelled", "arrived", "completed"])
+    assert.equal(attendanceReminderDue({ ...booked, status }, at - 3600000), null);
+  assert.equal(attendanceReminderDue(booked, at), null);
+  assert.equal(attendanceReminderDue({ ...sent, time: "11:00" }, at - 20 * 3600000).hours, 24);
+});
+test("calendar includes future attendance alarms and omits expired ones", () => {
+  const at = appointmentTime(visit.date, visit.time);
+  const early = visitCalendar(visit, "ru", 10, at - 96 * 3600000);
+  for (const hours of [72, 24, 2]) assert.ok(early.includes(`TRIGGER:-PT${hours}H`));
+  const late = visitCalendar(visit, "ru", 10, at - 3 * 3600000);
+  assert.ok(!late.includes("TRIGGER:-PT72H"));
+  assert.ok(!late.includes("TRIGGER:-PT24H"));
+  assert.ok(late.includes("TRIGGER:-PT2H"));
+});

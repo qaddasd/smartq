@@ -2,9 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell, CheckCheck, Trash2 } from "lucide-react";
 import { Screen, Card, Button, DemoTag } from "@/components/ui-kit";
 import { useStore } from "@/lib/store";
+import { VisitReminders } from "@/components/VisitReminders";
+import { appointmentTime } from "@/lib/visits";
 export const Route = createFileRoute("/notifications")({ component: Notifications });
 function Notifications() {
-  const { state, copy, t, markAllRead, clearNotifications, unreadCount } = useStore();
+  const { state, copy, t, markAllRead, clearNotifications, unreadCount, confirmVisit } = useStore();
+  const nextVisit = state.visits
+    .filter((v) => v.status === "booked" && appointmentTime(v.date, v.time) > Date.now())
+    .sort((a, b) => appointmentTime(a.date, a.time) - appointmentTime(b.date, b.time))[0];
   return (
     <Screen
       title={copy("Уведомления", "Хабарламалар")}
@@ -14,6 +19,9 @@ function Notifications() {
       )}
       right={<DemoTag />}
     >
+      <div className="mb-6">
+        <VisitReminders visit={nextVisit} />
+      </div>
       {!state.notifications.length ? (
         <Card className="empty-state">
           <Bell size={42} />
@@ -67,6 +75,25 @@ function Notifications() {
                   <p className="text-xs text-muted-foreground leading-relaxed mt-2">
                     {n.body?.[state.lang] ?? t(n.bodyKey, n.params)}
                   </p>
+                  {n.visitId &&
+                    state.visits.some((v) => v.id === n.visitId && v.status === "booked") && (
+                      <div className="reminder-response-buttons mt-3">
+                        <button
+                          disabled={!!state.visits.find((v) => v.id === n.visitId)?.confirmedAt}
+                          onClick={() => confirmVisit(n.visitId!)}
+                        >
+                          {state.visits.find((v) => v.id === n.visitId)?.confirmedAt
+                            ? copy("Подтверждено", "Расталды")
+                            : copy("Я приду", "Мен келемін")}
+                        </button>
+                        <Link to="/book" search={{ edit: n.visitId }}>
+                          {copy("Перенести", "Уақытты ауыстыру")}
+                        </Link>
+                        <Link to="/appointments">
+                          {copy("Управлять записью", "Жазылуды басқару")}
+                        </Link>
+                      </div>
+                    )}
                   <time
                     className="block text-[10px] text-muted-foreground mt-3"
                     dateTime={new Date(n.time).toISOString()}
