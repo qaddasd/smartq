@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "SmartQ Health",
+  "short_name": "SmartQ",
+  "description": "Запись на приём и электронная очередь · Демонстрационная версия",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050607",
+  "theme_color": "#050607",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Моя очередь", "url": "/queue" },
+    { "name": "Записаться", "url": "/book" }
+  ]
+}
