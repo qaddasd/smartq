@@ -6,9 +6,17 @@ export const regionalScreeningVolume = {
   origin: "Provided by the project team; primary source and reporting year pending",
 } as const;
 export const economicSources = {
+  lateDiagnosis:
+    "https://www.lada.kz/medicine/154137-v-mangistau-fiksiruiut-rost-sluchaev-onkologii-na-pozdnikh-stadiiakh.html",
   regional: "https://www.gov.kz/memleket/entities/mangystau/press/news/details/1059480",
   reminders:
     "https://www.cochrane.org/evidence/CD007458_mobile-phone-messaging-reminders-attendance-healthcare-appointments",
+} as const;
+export const lateDiagnosisEvidence = {
+  publicationDate: "2026-06-10",
+  period: { ru: "Январь—май 2026", kk: "2026 жылғы қаңтар—мамыр" },
+  stageIVSharePercent: 16.3,
+  relativeShareGrowthPercent: 63,
 } as const;
 export interface BudgetRecord {
   id: string;

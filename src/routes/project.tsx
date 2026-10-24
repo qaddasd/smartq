@@ -14,6 +14,7 @@ import {
 import { Screen } from "@/components/ui-kit";
 import { ProjectNav } from "@/components/ProjectNav";
 import { useStore } from "@/lib/store";
+import { economicSources } from "@/lib/economics";
 
 export const Route = createFileRoute("/project")({
   head: () => ({ meta: [{ title: "SmartQ — о проекте и плане пилота" }] }),
@@ -178,6 +179,23 @@ function ProjectPage() {
           ))}
         </div>
       </section>
+      <aside className="project-regional-evidence">
+        <div>
+          <span className="health-eyebrow">
+            {copy("ЗАЧЕМ ПРОЕКТ МАНГИСТАУ", "ЖОБА МАҢҒЫСТАУҒА НЕ ҮШІН КЕРЕК")}
+          </span>
+          <h2>
+            {copy("Региональная проблема позднего выявления", "Өңірдегі кеш анықтау мәселесі")}
+          </h2>
+          <a href={economicSources.lateDiagnosis} target="_blank" rel="noreferrer">
+            Lada.kz · 10.06.2026 <ArrowUpRight size={15} />
+          </a>
+        </div>
+        <Link to="/economics" hash="regional-problem">
+          {copy("Данные и обоснование", "Деректер мен негіздеме")}
+          <ArrowRight size={17} />
+        </Link>
+      </aside>
       <div className="project-outcomes">
         {[
           [

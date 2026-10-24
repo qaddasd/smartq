@@ -15,6 +15,7 @@ import {
 import { Screen, Card } from "@/components/ui-kit";
 import { ProjectNav } from "@/components/ProjectNav";
 import { SmartIcon } from "@/components/SmartIcons";
+import { RegionalProblem } from "@/components/RegionalProblem";
 import { useStore } from "@/lib/store";
 import {
   economicSources,
@@ -148,6 +149,7 @@ function EconomicsPage() {
           </p>
         </div>
       </section>
+      <RegionalProblem />
       <div className="regional-section-title">
         <span>01</span>
         <div>
