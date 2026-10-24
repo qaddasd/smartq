@@ -1,519 +1,463 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Calculator, RotateCcw, Download, Info, SlidersHorizontal } from "lucide-react";
-import { Screen } from "@/components/ui-kit";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Download,
+  Check,
+  MapPin,
+  Clock3,
+  Wallet,
+  FileCheck2,
+  CalendarCheck2,
+  BellRing,
+  ShieldCheck,
+} from "lucide-react";
+import { Screen, Card } from "@/components/ui-kit";
 import { ProjectNav } from "@/components/ProjectNav";
+import { SmartIcon } from "@/components/SmartIcons";
 import { useStore } from "@/lib/store";
-import { calculateEconomics, defaultEconomicInputs, type EconomicInputs } from "@/lib/economics";
+import {
+  economicSources,
+  economicsRegion,
+  regionalScreeningVolume,
+  measureRegionalPilot,
+} from "@/lib/economics";
+import rationale from "../../docs/REGIONAL_ECONOMICS.md?raw";
 
 export const Route = createFileRoute("/economics")({
-  head: () => ({ meta: [{ title: "SmartQ — экономика проекта" }] }),
+  head: () => ({
+    meta: [
+      { title: "SmartQ — польза для бюджета Мангистауской области" },
+      {
+        name: "description",
+        content:
+          "Экономическое обоснование SmartQ для Мангистауской области: использование диагностической мощности, проверяемые расходы и план оценки пилота.",
+      },
+    ],
+  }),
   component: EconomicsPage,
 });
-
 function EconomicsPage() {
   const { copy, state } = useStore();
-  const [inputs, setInputs] = useState<Record<keyof EconomicInputs, string>>(
-    () =>
-      Object.fromEntries(
-        Object.entries(defaultEconomicInputs).map(([key, value]) => [key, String(value)]),
-      ) as Record<keyof EconomicInputs, string>,
-  );
-  const [scenario, setScenario] = useState("base");
-  const values = Object.fromEntries(
-    Object.entries(inputs).map(([key, value]) => [key, Number(value)]),
-  ) as unknown as EconomicInputs;
-  const valid =
-    Object.values(inputs).every((value) => value.trim() !== "") &&
-    Object.values(values).every((value) => Number.isFinite(value) && value >= 0) &&
-    [values.centers, values.slotsPerDay, values.workingDays, values.messagesPerVisit].every(
-      Number.isInteger,
-    ) &&
-    values.centers >= 1 &&
-    values.workingDays >= 1 &&
-    values.workingDays <= 31 &&
-    values.noShowBefore <= 100 &&
-    values.noShowAfter <= values.noShowBefore &&
-    values.refillRate <= 100;
-  const result = valid ? calculateEconomics(values) : null;
-  const nf = (value: number, decimals = 0) =>
-    new Intl.NumberFormat(state.lang === "kk" ? "kk-KZ" : "ru-RU", {
-      maximumFractionDigits: decimals,
-    }).format(value);
-  const money = (value: number) => `${nf(value)} ₸`;
-  function update(key: keyof EconomicInputs, value: string) {
-    setScenario("custom");
-    setInputs((previous) => ({ ...previous, [key]: value }));
-  }
-  function preset(id: string) {
-    const after = id === "careful" ? 14 : id === "ambitious" ? 6 : 10;
-    const refill = id === "careful" ? 40 : id === "ambitious" ? 85 : 65;
-    setInputs((previous) => ({
-      ...previous,
-      noShowBefore: "18",
-      noShowAfter: String(after),
-      refillRate: String(refill),
-    }));
-    setScenario(id);
-  }
-  function field(
-    key: keyof EconomicInputs,
-    ru: string,
-    kk: string,
-    unit: string,
-    max?: number,
-    step = 1,
-  ) {
-    return (
-      <label className="econ-field" key={key}>
-        <span>{copy(ru, kk)}</span>
-        <span className="econ-input-wrap">
-          <input
-            type="number"
-            min={0}
-            max={max}
-            step={step}
-            value={inputs[key]}
-            onChange={(event) => update(key, event.target.value)}
-          />
-          <small>{unit}</small>
-        </span>
-      </label>
-    );
-  }
+  // No verified regional pilot records are connected yet. Unknown is not zero.
+  const pilot = measureRegionalPilot({ slots: null, avoidedCosts: null, additionalCosts: null });
+  const pathways = [
+    {
+      icon: CalendarCheck2,
+      tag: copy("ИСПОЛЬЗОВАНИЕ МОЩНОСТИ", "ҚУАТТЫ ПАЙДАЛАНУ"),
+      title: copy("Больше пользы от рабочего времени", "Жұмыс уақытынан көбірек пайда"),
+      body: copy(
+        "Если отменённое время занял другой пациент и обследование завершено, уже доступный кабинет используется для медицинской помощи, а не простаивает.",
+        "Бас тартылған уақытқа басқа пациент жазылып, тексеруден өтсе, қолжетімді кабинет бос тұрмай, медициналық көмекке пайдаланылады.",
+      ),
+      note: copy(
+        "Измеряем в завершённых визитах и часах.",
+        "Аяқталған қабылдау мен сағатпен өлшейміз.",
+      ),
+    },
+    {
+      icon: Wallet,
+      tag: copy("БЮДЖЕТНЫЙ ЭФФЕКТ", "БЮДЖЕТКЕ ӘСЕР"),
+      title: copy("Меньше устранимых расходов", "Қысқартуға болатын шығын азаяды"),
+      body: copy(
+        "Денежная экономия возникает только при фактическом сокращении оплачиваемых затрат, например сверхурочных. Дополнительные обследования тоже требуют ресурсов — эти расходы учитываются.",
+        "Ақшалай үнем тек нақты төленетін шығын, мысалы үстеме жұмыс ақысы қысқарғанда пайда болады. Қосымша тексерулер де ресурстарды қажет етеді — бұл шығын ескеріледі.",
+      ),
+      note: copy(
+        "Подтверждаем документами за один период.",
+        "Бір кезеңнің құжаттарымен растаймыз.",
+      ),
+    },
+    {
+      icon: ShieldCheck,
+      tag: copy("ДОЛГОСРОЧНАЯ ПЕРСПЕКТИВА", "ҰЗАҚ МЕРЗІМДІ БАҒЫТ"),
+      title: copy("Доступность своевременной диагностики", "Уақтылы диагностиканың қолжетімділігі"),
+      body: copy(
+        "Система помогает организовать путь на обследование. Влияние на стадии заболевания и затраты лечения проверяют отдельно; минуты ожидания сами по себе не доказывают этот эффект.",
+        "Жүйе тексеруге баруды ұйымдастыруға көмектеседі. Ауру сатысы мен емдеу шығынына әсері бөлек тексеріледі; күту минуттары бұл әсерді өздігінен дәлелдемейді.",
+      ),
+      note: copy(
+        "Проверяем по клиническим данным региона.",
+        "Өңірдің клиникалық деректерімен тексереміз.",
+      ),
+    },
+  ];
   function download() {
-    if (!result) return;
-    const report = {
-      model: "SmartQ — illustrative monthly resource model / Демонстрационная модель",
-      note: "Resource values are not cash savings or proven clinical outcomes. All inputs are assumptions.",
-      units: "KZT, minutes, hours, visits; monthly unless specified",
-      inputs: values,
-      results: result,
-    };
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }),
-    );
+    const url = URL.createObjectURL(new Blob([rationale], { type: "text/markdown;charset=utf-8" }));
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = "smartq-economic-scenario.json";
+    anchor.download = "SmartQ-Mangystau-economic-rationale.md";
+    document.body.appendChild(anchor);
     anchor.click();
-    URL.revokeObjectURL(url);
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
     <Screen
-      title={copy("Экономика SmartQ", "SmartQ экономикасы")}
+      title={copy("Экономика для Мангистау", "Маңғыстау үшін экономика")}
       subtitle={copy(
-        "Сколько ресурсов может вернуть более точная запись на скрининг.",
-        "Скринингке дәлірек жазылу қанша ресурсты қайтаруы мүмкін.",
+        "Общественная польза и бережное использование средств здравоохранения региона.",
+        "Қоғамдық пайда және өңір денсаулық сақтау қаражатын ұқыпты пайдалану.",
       )}
       right={
-        <span className="project-label">{copy("МОДЕЛЬ · НЕ ОТЧЁТ", "МОДЕЛЬ · ЕСЕП ЕМЕС")}</span>
+        <span className="project-label regional-page-label">
+          {copy("РЕГИОНАЛЬНЫЙ ПОДХОД", "ӨҢІРЛІК ТӘСІЛ")}
+        </span>
       }
     >
       <ProjectNav />
-      <p className="queue-economics-note">
-        {copy(
-          "Формулы очередей и источник исследования вынесены в научное обоснование. Денежные расчёты ниже — отдельная балансовая модель: её исходные цены, неявки и эффект напоминаний являются допущениями, не данными статьи.",
-          "Кезек формулалары мен зерттеу дереккөзі ғылыми негіздемеде берілген. Төмендегі ақша есебі — бөлек баланс моделі: баға, келмеу мен еске салу әсері мақала деректері емес, жорамалдар.",
-        )}
-      </p>
-      <section className="econ-intro">
+      <section className="regional-econ-hero">
         <div>
-          <span className="project-kicker">
-            <Calculator size={16} /> {copy("ОТ ОЧЕРЕДИ К ЭФФЕКТИВНОСТИ", "КЕЗЕКТЕН ТИІМДІЛІККЕ")}
+          <span className="regional-eyebrow">
+            <MapPin size={16} />
+            {economicsRegion[state.lang]}
           </span>
           <h2>
-            {copy(
-              "Меньше пустых слотов.\nБольше завершённых обследований.",
-              "Бос уақыт азаяды.\nАяқталған тексерулер көбейеді.",
-            )}
+            {copy("Больше пользы\nот уже выделенных средств", "Бөлінген қаражаттан\nкөбірек пайда")}
           </h2>
           <p>
             {copy(
-              "Неявка оставляет кабинет и время специалиста незанятыми. Напоминание и своевременный перенос дают возможность принять другого пациента в тот же рабочий день.",
-              "Келмей қалу кабинет пен маман уақытын бос қалдырады. Еске салу мен уақытылы ауыстыру сол жұмыс күні басқа пациентті қабылдауға мүмкіндік береді.",
+              "SmartQ рассматривается как способ улучшить организацию онкоскрининга: снизить потери времени, использовать свободные слоты и сделать диагностику доступнее жителям области.",
+              "SmartQ онкоскринингті ұйымдастыруды жақсарту тәсілі ретінде қарастырылады: уақыт жоғалтуды азайту, бос уақытты пайдалану және облыс тұрғындары үшін диагностиканы қолжетімді ету.",
             )}
           </p>
+          <div className="regional-hero-links">
+            <Link to="/book">
+              {copy("Прототип для пациента", "Пациентке арналған прототип")}
+              <ArrowRight size={17} />
+            </Link>
+            <a href="#economic-method">
+              {copy("Как обосновать эффект", "Әсерді қалай негіздеуге болады")} ↓
+            </a>
+          </div>
         </div>
-        <div className="econ-intro-note">
-          <Info size={23} />
-          <b>{copy("Что именно считаем", "Нені есептейміз")}</b>
+        <div className="regional-purpose">
+          <SmartIcon name="economics" size={62} />
+          <span>{copy("ЦЕЛЬ ПРОЕКТА", "ЖОБА МАҚСАТЫ")}</span>
+          <h3>
+            {copy(
+              "Работающая запись.\nИспользуемые кабинеты.\nПроверяемый результат.",
+              "Жұмыс істейтін жазылу.\nПайдаланылатын кабинеттер.\nТексерілетін нәтиже.",
+            )}
+          </h3>
           <p>
             {copy(
-              "Стоимость восстановленной мощности и времени регистратуры. Это оценка ресурсов: она не означает, что расходы клиники автоматически уменьшатся.",
-              "Қалпына келген қуат пен тіркеу бөлімі уақытының құны. Бұл ресурс бағасы: клиника шығындары автоматты түрде азаяды дегенді білдірмейді.",
+              "Актау и медицинские организации Мангистауской области. Эффект оцениваем в границах регионального пилота.",
+              "Ақтау және Маңғыстау облысының медициналық ұйымдары. Әсерді өңірлік пилот аясында бағалаймыз.",
             )}
           </p>
         </div>
       </section>
-      <div className="econ-section-head">
+      <div className="regional-section-title">
+        <span>01</span>
         <div>
-          <span className="project-kicker">01 / {copy("РАСЧЁТ", "ЕСЕПТЕУ")}</span>
-          <h2>{copy("Сценарий для вашей сети", "Сіздің желіңізге арналған сценарий")}</h2>
+          <small>{copy("МЕХАНИЗМ ПОЛЬЗЫ", "ПАЙДА МЕХАНИЗМІ")}</small>
+          <h2>
+            {copy(
+              "Как организация очереди связана с экономикой",
+              "Кезекті ұйымдастыру экономикамен қалай байланысты",
+            )}
+          </h2>
         </div>
-        <button
-          className="project-text-button"
-          onClick={() => {
-            setInputs(
-              Object.fromEntries(
-                Object.entries(defaultEconomicInputs).map(([key, value]) => [key, String(value)]),
-              ) as Record<keyof EconomicInputs, string>,
-            );
-            setScenario("base");
-          }}
-        >
-          <RotateCcw size={15} />
-          {copy("Сбросить", "Қалпына келтіру")}
-        </button>
       </div>
-      <p className="econ-caption">
-        {copy(
-          "Все исходные значения — учебные допущения. Меняйте их, чтобы проверить чувствительность модели. Сценарии меняют только долю неявок и возврат слотов.",
-          "Барлық бастапқы мәндер — оқу жорамалдары. Модель сезімталдығын тексеру үшін оларды өзгертіңіз. Сценарийлер тек келмеу үлесі мен уақытты толтыруды өзгертеді.",
-        )}
-      </p>
-      <div className="econ-scenarios" aria-label={copy("Сценарий расчёта", "Есептеу сценарийі")}>
-        {[
-          ["careful", copy("Осторожный", "Сақ")],
-          ["base", copy("Базовый", "Негізгі")],
-          ["ambitious", copy("Целевой", "Мақсатты")],
-        ].map(([id, label]) => (
-          <button key={id} aria-pressed={scenario === id} onClick={() => preset(id!)}>
-            {label}
-          </button>
+      <div className="regional-pathways">
+        {pathways.map(({ icon: Icon, tag, title, body, note }) => (
+          <Card key={tag}>
+            <Icon size={27} />
+            <small>{tag}</small>
+            <h3>{title}</h3>
+            <p>{body}</p>
+            <b>{note}</b>
+          </Card>
         ))}
-        {scenario === "custom" && <span>{copy("Ваши значения", "Сіздің мәндеріңіз")}</span>}
       </div>
-      <div className="econ-calculator">
-        <section
-          className="econ-controls"
-          aria-label={copy("Параметры расчёта", "Есептеу параметрлері")}
-        >
-          <h3>
-            <SlidersHorizontal size={17} />
-            {copy("Исходные данные", "Бастапқы деректер")}
-          </h3>
-          <div className="econ-fields">
-            {field("centers", "Учреждений в сети", "Желідегі мекемелер", copy("шт.", "дана"))}
-            {field(
-              "slotsPerDay",
-              "Записей в день / центр",
-              "Күніне жазылу / орталық",
-              copy("зап.", "жаз."),
-            )}
-            {field(
-              "workingDays",
-              "Рабочих дней в месяц",
-              "Айдағы жұмыс күндері",
-              copy("дн.", "күн"),
-              31,
-            )}
-            {field("noShowBefore", "Неявки до SmartQ", "SmartQ дейін келмеу", "%", 100)}
-            {field(
-              "noShowAfter",
-              "Неявки после напоминаний",
-              "Еске салудан кейін келмеу",
-              "%",
-              100,
-            )}
-            {field(
-              "refillRate",
-              "Вернутся в реальные визиты¹",
-              "Нақты қабылдауға айналады¹",
-              "%",
-              100,
-            )}
-          </div>
-          <p className="econ-footnote">
-            {copy(
-              "¹ Доля предотвращённых неявок, которая действительно превратится в завершённые визиты; остальные слоты считаем потерянными.",
-              "¹ Алдын алынған келмеулердің аяқталған қабылдауға айналған үлесі; қалған уақыт жоғалған болып есептеледі.",
-            )}
-          </p>
-          <details className="econ-details">
-            <summary>{copy("Стоимость, время и бюджет", "Құн, уақыт және бюджет")}</summary>
-            <div className="econ-fields">
-              {field("slotMinutes", "Длительность приёма", "Қабылдау ұзақтығы", copy("мин", "мин"))}
-              {field("slotValue", "Ресурсная стоимость слота²", "Уақыттың ресурстық құны²", "₸")}
-              {field(
-                "adminMinutes",
-                "Экономия регистратуры / запись²",
-                "Тіркеу уақыты / жазылу²",
-                copy("мин", "мин"),
-                undefined,
-                0.1,
-              )}
-              {field(
-                "staffHourlyCost",
-                "Стоимость часа регистратуры",
-                "Тіркеу сағатының құны",
-                "₸",
-              )}
-              {field("subscription", "Подписка / центр / месяц", "Жазылым / орталық / ай", "₸")}
-              {field(
-                "messagesPerVisit",
-                "Сообщений на запись",
-                "Бір жазылуға хабарлама",
-                copy("шт.", "дана"),
-              )}
-              {field(
-                "messageCost",
-                "Цена одного сообщения",
-                "Бір хабарлама бағасы",
-                "₸",
-                undefined,
-                0.1,
-              )}
-              {field("monthlySupport", "Прочие расходы / месяц", "Өзге шығын / ай", "₸")}
-              {field("setupCost", "Разовое внедрение", "Бір реттік енгізу", "₸")}
+      <section
+        className="regional-flow"
+        aria-label={copy(
+          "Как используется освободившийся слот",
+          "Босаған уақыт қалай пайдаланылады",
+        )}
+      >
+        {[
+          [
+            BellRing,
+            copy("Напомнить", "Еске салу"),
+            copy("Пациент подтверждает планы", "Пациент жоспарын растайды"),
+          ],
+          [
+            CalendarCheck2,
+            copy("Узнать об отмене", "Бас тартуды білу"),
+            copy("Время возвращается в расписание", "Уақыт кестеге қайтарылады"),
+          ],
+          [
+            ArrowRight,
+            copy("Предложить слот", "Уақытты ұсыну"),
+            copy("Другому подходящему пациенту", "Басқа сәйкес пациентке"),
+          ],
+          [
+            Check,
+            copy("Завершить обследование", "Тексеруді аяқтау"),
+            copy("Только после этого считаем результат", "Нәтижені тек содан кейін есептейміз"),
+          ],
+        ].map(([Icon, title, body], i) => {
+          const FlowIcon = Icon as typeof Check;
+          return (
+            <div key={String(title)}>
+              <span>0{i + 1}</span>
+              <FlowIcon size={21} />
+              <h3>{String(title)}</h3>
+              <p>{String(body)}</p>
             </div>
-            <p className="econ-footnote">
-              {copy(
-                "² Стоимость слота включает только клинические ресурсы, без регистратуры. Её время оценивается отдельно, чтобы не учитывать один ресурс дважды. Подписка и цены — примеры, не коммерческое предложение.",
-                "² Уақыт құны тек клиникалық ресурстарды қамтиды, тіркеу бөлімі кірмейді. Қосарлап есептемеу үшін оның уақыты бөлек бағаланады. Бағалар — мысал, коммерциялық ұсыныс емес.",
-              )}
-            </p>
-          </details>
-        </section>
-        <section
-          className="econ-results"
-          aria-label={copy("Результаты расчёта", "Есептеу нәтижелері")}
-        >
-          {!result ? (
-            <div className="econ-validation" role="alert">
-              {copy(
-                "Заполните поля неотрицательными числами. Учреждений — от 1, рабочих дней — от 1 до 31. Количество записей и сообщений — целое число. Проценты — от 0 до 100; неявки после не могут превышать исходный уровень.",
-                "Өрістерді теріс емес сандармен толтырыңыз. Мекемелер — 1-ден, жұмыс күндері — 1–31. Жазылулар мен хабарламалар — бүтін сан. Пайыз — 0–100; кейінгі келмеу бастапқыдан аспауы тиіс.",
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="econ-result-top">
-                <span>{copy("ПОТЕНЦИАЛ ЗА МЕСЯЦ", "АЙЛЫҚ ӘЛЕУЕТ")}</span>
-                <span>{copy("По вашим допущениям", "Сіздің жорамалдарыңыз бойынша")}</span>
-              </div>
-              <div className="econ-big-result">
-                <strong>+{nf(result.recoveredVisits)}</strong>
-                <h3>{copy("дополнительных обследований", "қосымша тексеру")}</h3>
-                <p>
-                  {nf(result.bookings)}{" "}
-                  {copy("записей в месяц в выбранной сети", "таңдалған желідегі айлық жазылу")}
-                </p>
-              </div>
-              <div className="econ-mini-metrics">
-                <div>
-                  <strong>
-                    {nf(result.clinicalHours, 1)} {copy("ч", "сағ")}
-                  </strong>
-                  <span>{copy("времени кабинетов возвращено", "кабинет уақыты қайтарылды")}</span>
-                </div>
-                <div>
-                  <strong>
-                    {nf(result.adminHours, 1)} {copy("ч", "сағ")}
-                  </strong>
-                  <span>
-                    {copy("времени регистратуры сохранено", "тіркеу бөлімі уақыты үнемделді")}
-                  </span>
-                </div>
-              </div>
-              <div className="econ-money-lines">
-                <div>
-                  <span>{copy("Ресурсная ценность визитов", "Қабылдаулардың ресурс құны")}</span>
-                  <b>{money(result.capacityValue)}</b>
-                </div>
-                <div>
-                  <span>{copy("Оценка времени регистратуры", "Тіркеу уақытының бағасы")}</span>
-                  <b>{money(result.adminValue)}</b>
-                </div>
-                <div>
-                  <span>{copy("Расходы на систему / месяц", "Жүйе шығыны / ай")}</span>
-                  <b>−{money(result.monthlyCost)}</b>
-                </div>
-                <div className="econ-total">
-                  <span>{copy("Баланс ресурсной модели", "Ресурс моделінің балансы")}</span>
-                  <b>{money(result.resourceBalance)}</b>
-                </div>
-              </div>
-              <p className="econ-footnote">
-                {copy(
-                  "Положительный баланс означает, что оценка ресурсов превышает расходы. Для денежной окупаемости нужны подтверждённые доходы или реально сокращённые затраты. Дробные визиты — математическое ожидание; на экране округлены.",
-                  "Оң баланс ресурстар бағасы шығыннан жоғары екенін білдіреді. Ақшалай өтелу үшін расталған кіріс немесе нақты қысқарған шығын керек. Бөлшек қабылдау — математикалық күту; экранда дөңгелектелген.",
-                )}
-              </p>
-              <button className="project-outline-button" onClick={download}>
-                <Download size={16} />
-                {copy("Скачать расчёт и допущения", "Есеп пен жорамалдарды жүктеу")}
-              </button>
-            </>
-          )}
-        </section>
-      </div>
-      {result && (
-        <>
-          <div className="econ-section-head">
-            <div>
-              <span className="project-kicker">02 / {copy("ДО И ПОСЛЕ", "ДЕЙІН ЖӘНЕ КЕЙІН")}</span>
-              <h2>
-                {copy("Как меняется использование слотов", "Уақытты пайдалану қалай өзгереді")}
-              </h2>
-            </div>
-          </div>
-          <section className="econ-comparison">
-            {[
-              {
-                title: copy("Без SmartQ", "SmartQ жоқ"),
-                attended: result.attendedBefore,
-                missed: result.missedBefore,
-              },
-              {
-                title: copy("Со SmartQ · сценарий", "SmartQ бар · сценарий"),
-                attended: result.attendedAfter,
-                missed: result.unfilledAfter,
-              },
-            ].map((row) => (
-              <div key={row.title}>
-                <div className="econ-bar-label">
-                  <b>{row.title}</b>
-                  <span>
-                    {nf(row.attended)} / {nf(result.bookings)}
-                  </span>
-                </div>
-                <div
-                  className="econ-stacked-bar"
-                  role="img"
-                  aria-label={`${row.title}: ${nf(row.attended)} ${copy("визитов", "қабылдау")}, ${nf(row.missed)} ${copy("пустых слотов", "бос уақыт")}`}
-                >
-                  <span
-                    style={{
-                      width: `${result.bookings ? (row.attended / result.bookings) * 100 : 0}%`,
-                    }}
-                  />
-                </div>
-                <p>
-                  {nf(row.missed)} {copy("незаполненных слотов", "толтырылмаған уақыт")}
-                </p>
-              </div>
-            ))}
-            <div className="econ-chart-legend">
-              <span>
-                <i />
-                {copy("Завершённые визиты", "Аяқталған қабылдаулар")}
-              </span>
-              <span>
-                <i />
-                {copy("Потерянная мощность", "Жоғалған қуат")}
-              </span>
-            </div>
-          </section>
-          <div className="econ-section-head">
-            <div>
-              <span className="project-kicker">03 / {copy("БЮДЖЕТ", "БЮДЖЕТ")}</span>
-              <h2>{copy("Что оплачивает учреждение", "Мекеме не үшін төлейді")}</h2>
-            </div>
-          </div>
-          <section className="econ-budget-grid">
-            <div className="project-surface">
-              <h3>{copy("Ежемесячные расходы", "Ай сайынғы шығындар")}</h3>
-              <dl className="econ-budget-list">
-                <div>
-                  <dt>{copy("Подписка для сети", "Желі жазылымы")}</dt>
-                  <dd>{money(result.subscriptionCost)}</dd>
-                </div>
-                <div>
-                  <dt>{copy("Отправка напоминаний", "Еске салу жіберу")}</dt>
-                  <dd>{money(result.messagingCost)}</dd>
-                </div>
-                <div>
-                  <dt>{copy("Прочие расходы", "Өзге шығындар")}</dt>
-                  <dd>{money(values.monthlySupport)}</dd>
-                </div>
-                <div>
-                  <dt>{copy("Всего в месяц", "Айлық жиыны")}</dt>
-                  <dd>{money(result.monthlyCost)}</dd>
-                </div>
-              </dl>
-            </div>
-            <div className="project-surface">
-              <h3>{copy("Стоимость пилота и масштаба", "Пилот пен кеңейту құны")}</h3>
-              <dl className="econ-budget-list">
-                <div>
-                  <dt>{copy("Разовое внедрение", "Бір реттік енгізу")}</dt>
-                  <dd>{money(values.setupCost)}</dd>
-                </div>
-                <div>
-                  <dt>{copy("Первый год с внедрением", "Енгізумен бірге бірінші жыл")}</dt>
-                  <dd>{money(result.firstYearCost)}</dd>
-                </div>
-                <div>
-                  <dt>{copy("Расходы / дополнительный визит³", "Шығын / қосымша қабылдау³")}</dt>
-                  <dd>
-                    {result.costPerRecoveredVisit === null
-                      ? "—"
-                      : money(result.costPerRecoveredVisit)}
-                  </dd>
-                </div>
-              </dl>
-              <p className="econ-footnote">
-                {copy(
-                  "³ Только текущие расходы системы; внедрение не включено. Это не себестоимость медицинской услуги.",
-                  "³ Тек жүйенің ағымдағы шығыны; енгізу кірмейді. Бұл медициналық қызметтің өзіндік құны емес.",
-                )}
-              </p>
-            </div>
-          </section>
-        </>
-      )}
-      <details className="econ-methodology">
-        <summary>
-          {copy("Открыть формулы и границы модели", "Формулалар мен модель шекарасын ашу")}
-        </summary>
-        <ol>
-          <li>
-            {copy(
-              "Записи = центры × записи в день × рабочие дни.",
-              "Жазылулар = орталықтар × күндік жазылулар × жұмыс күндері.",
-            )}
-          </li>
-          <li>
-            {copy(
-              "Возвращённые визиты = записи × (неявки до − неявки после) / 100 × доля возврата / 100.",
-              "Қайтарылған қабылдаулар = жазылулар × (дейінгі − кейінгі келмеу) / 100 × қайтару үлесі / 100.",
-            )}
-          </li>
-          <li>
-            {copy(
-              "Ресурсный эффект = возвращённые визиты × стоимость слота + записи × сэкономленные минуты регистратуры / 60 × стоимость её часа.",
-              "Ресурстық әсер = қайтарылған қабылдау × уақыт құны + жазылулар × үнемделген тіркеу минуты / 60 × сағат құны.",
-            )}
-          </li>
-          <li>
-            {copy(
-              "Расходы = центры × подписка + записи × сообщения на запись × цена сообщения + прочие расходы. Баланс = ресурсный эффект − расходы.",
-              "Шығын = орталықтар × жазылым + жазылулар × хабарлама саны × хабарлама бағасы + өзге шығын. Баланс = ресурстық әсер − шығын.",
-            )}
-          </li>
-        </ol>
-        <p>
-          {copy(
-            "Модель не оценивает диагнозы, выживаемость, предотвращённые случаи рака, доход по тарифам или экономию лечения. Не учитывает сезонность, налоги и дисконтирование. Фактические расходы на интеграцию, защиту данных, обучение и связь нужно уточнить с учреждением и провайдерами. Перед пилотом заменить все допущения замерами и сметой.",
-            "Модель диагнозды, өмір сүруді, алдын алынған қатерлі ісікті, тарифтік кірісті немесе емдеу үнемін бағаламайды. Маусымдылық, салық пен дисконттау ескерілмейді. Интеграция, дерек қорғау, оқыту мен байланыс шығынын мекеме және провайдерлермен нақтылау қажет. Пилот алдында жорамалдарды өлшемдер мен сметаға ауыстыру керек.",
-          )}
-        </p>
-      </details>
-      <section className="econ-bottom-link">
+          );
+        })}
+      </section>
+      <div className="regional-section-title" id="economic-method">
+        <span>02</span>
         <div>
-          <b>
-            {copy("Как доказать эффект на практике?", "Әсерді іс жүзінде қалай дәлелдеуге болады?")}
-          </b>
+          <small>{copy("ОБОСНОВАНИЕ РАСЧЁТА", "ЕСЕПТІ НЕГІЗДЕУ")}</small>
+          <h2>
+            {copy("Два результата — в своих единицах", "Екі нәтиже — өз өлшем бірліктерінде")}
+          </h2>
+        </div>
+      </div>
+      <div className="regional-formulas">
+        <Card>
+          <div className="regional-formula-heading">
+            <Clock3 />
+            <span>{copy("ОРГАНИЗАЦИОННЫЙ", "ҰЙЫМДАСТЫРУШЫЛЫҚ")}</span>
+          </div>
+          <h3>{copy("Использованное время кабинетов", "Кабинеттердің пайдаланылған уақыты")}</h3>
+          <div className="regional-equation">H = Σtᵢ / 60</div>
           <p>
             {copy(
-              "План пилота, метрики и модель финансирования — в паспорте проекта.",
-              "Пилот жоспары, өлшемдер мен қаржыландыру моделі — жоба паспортында.",
+              "Суммируем длительность только завершённых обследований в повторно заполненных отменённых слотах. Минуты делим на 60 и получаем часы.",
+              "Бас тартылған, қайта толтырылған уақыттағы тек аяқталған тексерулер ұзақтығын қосамыз. Минутты 60-қа бөліп, сағат аламыз.",
+            )}
+          </p>
+          <dl>
+            <div>
+              <dt>tᵢ</dt>
+              <dd>
+                {copy(
+                  "Фактическая длительность такого обследования в минутах.",
+                  "Осындай тексерудің минутпен нақты ұзақтығы.",
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>H</dt>
+              <dd>
+                {copy(
+                  "Время, использованное для приёма, вместо простоя.",
+                  "Бос тұру орнына қабылдауға пайдаланылған уақыт.",
+                )}
+              </dd>
+            </div>
+          </dl>
+          <div className="regional-proof">
+            <FileCheck2 size={17} />
+            {copy(
+              "Основание: журнал слотов и завершения процедур. Часы не переводим в тенге по придуманной цене.",
+              "Негізі: уақыттар мен процедура аяқталуы журналы. Сағатты ойдан алынған бағамен теңгеге айналдырмаймыз.",
+            )}
+          </div>
+        </Card>
+        <Card>
+          <div className="regional-formula-heading">
+            <Wallet />
+            <span>{copy("ДЕНЕЖНЫЙ", "АҚШАЛАЙ")}</span>
+          </div>
+          <h3>{copy("Чистое изменение расходов бюджета", "Бюджет шығынының таза өзгерісі")}</h3>
+          <div className="regional-equation">E = A − D</div>
+          <p>
+            {copy(
+              "Из подтверждённых избегнутых расходов вычитаем все дополнительные расходы того же публичного плательщика за тот же период пилота.",
+              "Расталған болдырылмаған шығыннан сол мемлекеттік төлеушінің пилоттың сол кезеңіндегі барлық қосымша шығынын шегереміз.",
+            )}
+          </p>
+          <dl>
+            <div>
+              <dt>A</dt>
+              <dd>
+                {copy(
+                  "Фактически избегнутые расходы: только подтверждённые бухгалтерией сокращения относительно сопоставимого варианта без SmartQ.",
+                  "Нақты болдырылмаған шығын: SmartQ-сыз салыстырмалы нұсқаға қатысты бухгалтерия растаған қысқартулар ғана.",
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>D</dt>
+              <dd>
+                {copy(
+                  "Дополнительные обследования, работа системы, связь, сопровождение и другие необходимые затраты.",
+                  "Қосымша тексерулер, жүйе жұмысы, байланыс, сүйемелдеу және өзге қажетті шығын.",
+                )}
+              </dd>
+            </div>
+          </dl>
+          <div className="regional-proof">
+            <FileCheck2 size={17} />
+            {copy(
+              "Основание: определение разницы затрат и первичные документы. Изменение может быть отрицательным.",
+              "Негізі: шығын айырмасының анықтамасы және бастапқы құжаттар. Өзгеріс теріс болуы мүмкін.",
+            )}
+          </div>
+        </Card>
+      </div>
+      {pilot.budgetEffectKzt === null && (
+        <div className="regional-budget-status">
+          <ShieldCheck size={25} />
+          <div>
+            <h3>
+              {copy(
+                "Итог в тенге — по документам пилота",
+                "Теңгемен қорытынды — пилот құжаттары бойынша",
+              )}
+            </h3>
+            <p>
+              {copy(
+                "Размер экономии пока не заявлен. Неизвестные расходы не заменяем нулём; прирост обследований и рост раннего выявления не назначаем заранее.",
+                "Үнем мөлшері әзірге мәлімделмейді. Белгісіз шығынды нөлге алмастырмаймыз; тексеру мен ерте анықтау өсімін алдын ала белгілемейміз.",
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+      <div className="regional-section-title">
+        <span>03</span>
+        <div>
+          <small>{copy("ДАННЫЕ МАНГИСТАУ", "МАҢҒЫСТАУ ДЕРЕКТЕРІ")}</small>
+          <h2>{copy("Что фиксируем в региональном пилоте", "Өңірлік пилотта нені тіркейміз")}</h2>
+        </div>
+      </div>
+      <div className="regional-evidence-table">
+        <table>
+          <thead>
+            <tr>
+              <th>{copy("Показатель", "Көрсеткіш")}</th>
+              <th>{copy("Чем подтверждается", "Немен расталады")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              [
+                copy(
+                  "Завершённые обследования в повторно заполненных слотах",
+                  "Қайта толтырылған уақыттағы аяқталған тексерулер",
+                ),
+                copy(
+                  "Обезличенная связь: отмена → повторная запись → завершённая процедура. Уникальный слот учитывается один раз.",
+                  "Дербессіз байланыс: бас тарту → қайта жазылу → аяқталған процедура. Бір уақыт бір рет есептеледі.",
+                ),
+              ],
+              [
+                copy("Неявки и ожидание до и после", "Дейінгі және кейінгі келмеу мен күту"),
+                copy(
+                  "Одинаковые определения, сопоставимые виды обследований и периоды; по возможности — контрольная группа.",
+                  "Бірдей анықтама, салыстырмалы тексеру түрлері мен кезеңдер; мүмкін болса — бақылау тобы.",
+                ),
+              ],
+              [
+                copy("Оплачиваемые затраты бюджета", "Бюджеттің төленетін шығындары"),
+                copy(
+                  "Документы участвующих организаций области и плательщика: избегнутые и дополнительные расходы без двойного учёта.",
+                  "Облыстағы қатысушы ұйымдар мен төлеуші құжаттары: қайталанбай есептелген болдырылмаған және қосымша шығын.",
+                ),
+              ],
+            ].map(([name, proof]) => (
+              <tr key={name}>
+                <th scope="row">{name}</th>
+                <td>{proof}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="regional-method-note">
+        {copy(
+          "Заполненный слот подтверждает использование мощности. Чтобы связать общий прирост обследований именно со SmartQ, отдельно учитываем сезонность, кадровые изменения и доступность оборудования.",
+          "Толтырылған уақыт қуатты пайдалануды растайды. Тексеру санының жалпы өсімін дәл SmartQ-мен байланыстыру үшін маусымдылықты, кадр өзгерісін және жабдық қолжетімділігін бөлек ескереміз.",
+        )}
+      </p>
+      <div className="regional-section-title">
+        <span>04</span>
+        <div>
+          <small>{copy("ИСТОЧНИКИ", "ДЕРЕККӨЗДЕР")}</small>
+          <h2>{copy("На что опирается обоснование", "Негіздеме неге сүйенеді")}</h2>
+        </div>
+      </div>
+      <div className="regional-sources">
+        <a href={economicSources.regional} target="_blank" rel="noreferrer">
+          <span>{copy("РЕГИОНАЛЬНЫЙ КОНТЕКСТ", "ӨҢІРЛІК КОНТЕКСТ")}</span>
+          <h3>
+            {copy("Акимат Мангистауской области · 2025", "Маңғыстау облысының әкімдігі · 2025")}
+            <ArrowUpRight size={18} />
+          </h3>
+          <p>
+            {copy(
+              "Развитие онкологической инфраструктуры: открытие ПЭТ/КТ-центра в Актау. Это контекст региона, а не данные о результатах SmartQ или объёме онкоскрининга.",
+              "Онкологиялық инфрақұрылымның дамуы: Ақтауда ПЭТ/КТ орталығының ашылуы. Бұл өңір контексті, SmartQ нәтижесі не онкоскрининг көлемі туралы дерек емес.",
+            )}
+          </p>
+        </a>
+        <a href={economicSources.reminders} target="_blank" rel="noreferrer">
+          <span>{copy("ОБОСНОВАНИЕ МЕХАНИЗМА", "МЕХАНИЗМДІ НЕГІЗДЕУ")}</span>
+          <h3>
+            Cochrane · 2013 · CD007458
+            <ArrowUpRight size={18} />
+          </h3>
+          <p>
+            {copy(
+              "Обзор исследований поддерживает применение SMS-напоминаний для повышения посещаемости. Он не определяет размер эффекта в Мангистау и не доказывает экономию SmartQ.",
+              "Зерттеулер шолуы қабылдауға келуді арттыру үшін SMS еске салуды қолдайды. Ол Маңғыстаудағы әсер мөлшерін анықтамайды және SmartQ үнемін дәлелдемейді.",
+            )}
+          </p>
+        </a>
+      </div>
+      <button className="project-outline-button regional-download" onClick={download}>
+        <Download size={17} />
+        {copy(
+          "Скачать обоснование и список нужных данных",
+          "Негіздеме мен қажетті деректер тізімін жүктеу",
+        )}
+      </button>
+      <section className="regional-annual-volume">
+        <div>
+          <span className="regional-eyebrow">
+            {copy("ПОКАЗАТЕЛЬ КОМАНДЫ ПРОЕКТА", "ЖОБА КОМАНДАСЫНЫҢ КӨРСЕТКІШІ")}
+          </span>
+          <strong>
+            {String(regionalScreeningVolume.annualExaminations).replace(
+              /\B(?=(\d{3})+(?!\d))/g,
+              "\u00a0",
+            )}
+          </strong>
+          <h2>{copy("обследований в год", "жылына тексеру")}</h2>
+        </div>
+        <div>
+          <span className="regional-source-pending">
+            {copy("Источник ожидается", "Дереккөз күтілуде")}
+          </span>
+          <p>
+            {copy(
+              "Число передано командой. Первичный источник, календарный год и охват учреждений уточняются. Это не заявленные дополнительные обследования благодаря SmartQ и не основание для денежного прогноза.",
+              "Санды команда берді. Бастапқы дереккөз, күнтізбелік жыл және мекемелер ауқымы нақтылануда. Бұл SmartQ арқасындағы қосымша тексерулер туралы мәлімдеме де, ақшалай болжамның негізі де емес.",
+            )}
+          </p>
+        </div>
+      </section>
+      <section className="econ-bottom-link">
+        <div>
+          <b>{copy("Один проект — понятный путь показа", "Бір жоба — түсінікті таныстыру жолы")}</b>
+          <p>
+            {copy(
+              "Прототип пациента → механизм очереди → польза для региона и проверка пилотом.",
+              "Пациент прототипі → кезек механизмі → өңірге пайда және пилотпен тексеру.",
             )}
           </p>
         </div>
         <Link to="/project">
-          {copy("О проекте", "Жоба туралы")}
+          {copy("Паспорт проекта", "Жоба паспорты")}
           <ArrowRight size={17} />
         </Link>
       </section>

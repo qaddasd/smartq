@@ -1,86 +1,70 @@
-/** Illustrative monthly resource model, not clinic financial reporting. */
-export interface EconomicInputs {
-  centers: number;
-  slotsPerDay: number;
-  workingDays: number;
-  noShowBefore: number;
-  noShowAfter: number;
-  refillRate: number;
-  slotMinutes: number;
-  slotValue: number;
-  adminMinutes: number;
-  staffHourlyCost: number;
-  subscription: number;
-  messageCost: number;
-  messagesPerVisit: number;
-  monthlySupport: number;
-  setupCost: number;
+/** Mangystau pilot: operational capacity and documented budget costs stay separate. */
+export const economicsRegion = { ru: "Мангистауская область", kk: "Маңғыстау облысы" } as const;
+export const regionalScreeningVolume = {
+  annualExaminations: 3800,
+  status: "source-pending",
+  origin: "Provided by the project team; primary source and reporting year pending",
+} as const;
+export const economicSources = {
+  regional: "https://www.gov.kz/memleket/entities/mangystau/press/news/details/1059480",
+  reminders:
+    "https://www.cochrane.org/evidence/CD007458_mobile-phone-messaging-reminders-attendance-healthcare-appointments",
+} as const;
+export interface BudgetRecord {
+  id: string;
+  amountKzt: number;
+  evidenceRef: string;
 }
-
-export const defaultEconomicInputs: EconomicInputs = {
-  centers: 3,
-  slotsPerDay: 60,
-  workingDays: 22,
-  noShowBefore: 18,
-  noShowAfter: 10,
-  refillRate: 65,
-  slotMinutes: 20,
-  slotValue: 2500,
-  adminMinutes: 1.5,
-  staffHourlyCost: 1800,
-  subscription: 70000,
-  messageCost: 7,
-  messagesPerVisit: 3,
-  monthlySupport: 30000,
-  setupCost: 1500000,
-};
-
-export function calculateEconomics(input: EconomicInputs) {
-  if (Object.values(input).some((value) => !Number.isFinite(value) || value < 0)) {
-    throw new RangeError("Inputs must be finite and non-negative");
+export interface RecoveredSlot {
+  id: string;
+  durationMinutes: number;
+  rebooked: boolean;
+  completed: boolean;
+}
+/** Inputs must cover the same pilot period, payer and regional institutions.
+ * Avoided costs are separately documented reductions, never slot tariffs or payroll valuations.
+ * null means no verified data; [] means a verified zero, not missing information.
+ */
+export function measureRegionalPilot(input: {
+  slots: RecoveredSlot[] | null;
+  avoidedCosts: BudgetRecord[] | null;
+  additionalCosts: BudgetRecord[] | null;
+}) {
+  const ids = new Set<string>();
+  for (const item of [...(input.avoidedCosts ?? []), ...(input.additionalCosts ?? [])]) {
+    if (
+      !item.id.trim() ||
+      ids.has(item.id) ||
+      !item.evidenceRef.trim() ||
+      !Number.isFinite(item.amountKzt) ||
+      item.amountKzt < 0
+    ) {
+      throw new RangeError(
+        "Budget records require unique IDs, evidence and non-negative finite KZT amounts",
+      );
+    }
+    ids.add(item.id);
   }
-  if ([input.noShowBefore, input.noShowAfter, input.refillRate].some((value) => value > 100)) {
-    throw new RangeError("Percentages must be between 0 and 100");
+  const slots = new Set<string>();
+  let minutes = 0;
+  for (const slot of input.slots ?? []) {
+    if (
+      !slot.id.trim() ||
+      slots.has(slot.id) ||
+      !Number.isFinite(slot.durationMinutes) ||
+      slot.durationMinutes < 0
+    ) {
+      throw new RangeError("Slot records require unique IDs and non-negative finite durations");
+    }
+    slots.add(slot.id);
+    if (slot.rebooked && slot.completed) minutes += slot.durationMinutes;
   }
-  if (input.noShowAfter > input.noShowBefore) {
-    throw new RangeError("Target no-show cannot exceed baseline in this improvement model");
-  }
-  const bookings = input.centers * input.slotsPerDay * input.workingDays;
-  const missedBefore = (bookings * input.noShowBefore) / 100;
-  const missedAfter = (bookings * input.noShowAfter) / 100;
-  // Only the fraction actually filled and attended counts as recovered capacity.
-  const recoveredVisits = ((missedBefore - missedAfter) * input.refillRate) / 100;
-  const clinicalHours = (recoveredVisits * input.slotMinutes) / 60;
-  const adminHours = (bookings * input.adminMinutes) / 60;
-  const capacityValue = recoveredVisits * input.slotValue;
-  const adminValue = adminHours * input.staffHourlyCost;
-  const resourceValue = capacityValue + adminValue;
-  const subscriptionCost = input.centers * input.subscription;
-  const messagingCost = bookings * input.messagesPerVisit * input.messageCost;
-  const monthlyCost = subscriptionCost + messagingCost + input.monthlySupport;
-  const resourceBalance = resourceValue - monthlyCost;
-  const firstYearCost = input.setupCost + monthlyCost * 12;
-  const coverageMonths = resourceBalance > 0 ? input.setupCost / resourceBalance : null;
-  const costPerRecoveredVisit = recoveredVisits > 0 ? monthlyCost / recoveredVisits : null;
   return {
-    bookings,
-    missedBefore,
-    missedAfter,
-    recoveredVisits,
-    clinicalHours,
-    adminHours,
-    capacityValue,
-    adminValue,
-    resourceValue,
-    subscriptionCost,
-    messagingCost,
-    monthlyCost,
-    resourceBalance,
-    firstYearCost,
-    coverageMonths,
-    costPerRecoveredVisit,
-    attendedBefore: bookings - missedBefore,
-    attendedAfter: bookings - missedBefore + recoveredVisits,
-    unfilledAfter: missedBefore - recoveredVisits,
+    recoveredHours: input.slots === null ? null : minutes / 60,
+    budgetEffectKzt:
+      input.avoidedCosts === null || input.additionalCosts === null
+        ? null
+        : input.avoidedCosts.reduce((sum, item) => sum + item.amountKzt, 0) -
+          input.additionalCosts.reduce((sum, item) => sum + item.amountKzt, 0),
   };
 }

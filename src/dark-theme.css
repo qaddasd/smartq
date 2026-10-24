@@ -1829,3 +1829,513 @@ select option {
     min-height: 350px;
   }
 }
+
+/* Regional public-budget rationale. No commercial price or scenario controls. */
+.regional-econ-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 36px;
+  align-items: center;
+  padding: 36px;
+  background: linear-gradient(125deg, #142c25, #171d21 70%);
+  border: 1px solid #304d40;
+  border-radius: 25px;
+}
+.regional-eyebrow {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  color: #8fd9b9;
+  letter-spacing: 1.1px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.regional-econ-hero h2 {
+  font-size: clamp(27px, 3.5vw, 42px);
+  line-height: 1.19;
+  font-weight: 600;
+  letter-spacing: -0.9px;
+  white-space: pre-line;
+  margin: 20px 0;
+}
+.regional-econ-hero p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #bbc9c5;
+}
+.regional-hero-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.regional-hero-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #9ce2c3;
+}
+.regional-hero-links a:first-child {
+  border-radius: 30px;
+  padding: 13px 18px;
+  background: #29b48d;
+  color: #062a20;
+  font-weight: 600;
+}
+.regional-purpose {
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid #38564a;
+  background: #172c25;
+  min-width: 0;
+}
+.regional-purpose > svg {
+  color: #68d4aa;
+  margin-bottom: 20px;
+}
+.regional-purpose > span {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #9bbfac;
+  display: block;
+}
+.regional-purpose h3 {
+  font-size: 23px;
+  line-height: 1.55;
+  font-weight: 500;
+  white-space: pre-line;
+  margin: 12px 0;
+}
+.regional-purpose p {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #a5b9ad;
+}
+.regional-section-title {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin: 36px 0 20px;
+  scroll-margin-top: 100px;
+}
+.regional-section-title > span {
+  font-size: 13px;
+  color: var(--primary);
+  border: 1px solid #345245;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  flex-shrink: 0;
+  background: #14261e;
+}
+.regional-section-title small {
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  color: var(--muted-foreground);
+}
+.regional-section-title h2 {
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 5px;
+}
+.regional-pathways {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+}
+.regional-pathways > .sq-card {
+  padding: 25px;
+}
+.regional-pathways svg {
+  color: #64cfa8;
+  margin-bottom: 18px;
+}
+.regional-pathways small {
+  display: block;
+  color: #91bba6;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+.regional-pathways h3 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 10px 0 14px;
+}
+.regional-pathways p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+.regional-pathways b {
+  display: block;
+  margin-top: 19px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a0d7bd;
+  font-weight: 500;
+}
+.regional-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin: 22px 0;
+  background: var(--border);
+}
+.regional-flow > div {
+  position: relative;
+  min-width: 0;
+  padding: 24px;
+  background: #141c1a;
+}
+.regional-flow > div > span {
+  position: absolute;
+  right: 19px;
+  top: 20px;
+  font-size: 11px;
+  color: #6c8a7d;
+}
+.regional-flow svg {
+  color: #66c6a2;
+}
+.regional-flow h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 15px 0 7px;
+}
+.regional-flow p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a6b6ad;
+}
+.regional-formulas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.regional-formulas > .sq-card {
+  padding: 28px;
+}
+.regional-formula-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #72cda9;
+}
+.regional-formula-heading span {
+  font-size: 10px;
+  letter-spacing: 1.3px;
+}
+.regional-formulas h3 {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.45;
+  margin-top: 16px;
+}
+.regional-equation {
+  font-family: Georgia, serif;
+  font-size: 37px;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  color: #a5e7c8;
+  padding: 22px 0;
+  margin: 15px 0;
+  border-top: 1px solid #30483c;
+  border-bottom: 1px solid #30483c;
+}
+.regional-formulas p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+}
+.regional-formulas dl {
+  margin-top: 20px;
+}
+.regional-formulas dl > div {
+  display: flex;
+  gap: 12px;
+  margin: 13px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.regional-formulas dt {
+  color: #a5e7c8;
+  min-width: 25px;
+  flex-shrink: 0;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+.regional-formulas dd {
+  color: #c0cbc5;
+}
+.regional-proof {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 22px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #14231d;
+  color: #9fb8aa;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.regional-proof svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #75b799;
+}
+.regional-budget-status {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid #374b42;
+  background: #15201c;
+  padding: 23px;
+  border-radius: 16px;
+  margin-top: 20px;
+}
+.regional-budget-status > svg {
+  flex-shrink: 0;
+  color: #8bbfa6;
+  margin-top: 2px;
+}
+.regional-budget-status h3 {
+  font-size: 17px;
+  font-weight: 500;
+}
+.regional-budget-status p {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #aabbaf;
+  margin-top: 8px;
+}
+.regional-evidence-table {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.regional-evidence-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.regional-evidence-table th,
+.regional-evidence-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 20px 24px;
+  font-size: 14px;
+  line-height: 1.75;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border);
+}
+.regional-evidence-table thead th {
+  font-size: 12px;
+  color: #92b8a3;
+  background: #18251e;
+}
+.regional-evidence-table thead th:first-child {
+  width: 36%;
+}
+.regional-evidence-table tbody th {
+  color: #e4ebe7;
+  font-weight: 500;
+  background: #171c1a;
+}
+.regional-evidence-table tbody td {
+  color: var(--muted-foreground);
+  background: var(--card);
+}
+.regional-evidence-table tr:last-child > * {
+  border-bottom: 0;
+}
+.regional-method-note {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  margin-top: 13px;
+}
+.regional-sources {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.regional-sources > a {
+  display: block;
+  min-width: 0;
+  border: 1px solid var(--border);
+  padding: 25px;
+  border-radius: 18px;
+  background: var(--card);
+  transition: border-color 0.15s;
+}
+.regional-sources > a:hover {
+  border-color: #4c8069;
+}
+.regional-sources span {
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  color: #91b7a2;
+}
+.regional-sources h3 {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 500;
+  margin: 12px 0;
+  color: #c6e7d6;
+}
+.regional-sources h3 svg {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.regional-sources p {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+}
+.regional-download {
+  margin-top: 20px;
+  max-width: 100%;
+  text-align: left;
+  line-height: 1.6;
+}
+.regional-annual-volume {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 35px;
+  margin-top: 36px;
+  padding: 34px;
+  border: 1px solid #2d5140;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #102a1e, #16201b);
+}
+.regional-annual-volume strong {
+  display: block;
+  color: #a2e6be;
+  font-size: 80px;
+  letter-spacing: -3px;
+  line-height: 1.1;
+  font-weight: 500;
+  margin-top: 15px;
+}
+.regional-annual-volume h2 {
+  font-size: 24px;
+  font-weight: 400;
+  color: #d2eadc;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+.regional-annual-volume p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #aebfb4;
+  margin-top: 16px;
+}
+.regional-source-pending {
+  display: inline-block;
+  font-size: 11px;
+  color: #e1ca90;
+  background: #332c1e;
+  border: 1px solid #5b4c29;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+@media (max-width: 1100px) {
+  .regional-econ-hero {
+    gap: 22px;
+    padding: 28px;
+  }
+  .regional-purpose {
+    padding: 22px;
+  }
+  .regional-purpose h3 {
+    font-size: 20px;
+  }
+  .regional-pathways {
+    grid-template-columns: 1fr;
+  }
+  .regional-pathways > .sq-card {
+    padding: 24px;
+  }
+}
+@media (max-width: 700px) {
+  .regional-page-label {
+    display: none;
+  }
+  .regional-econ-hero {
+    grid-template-columns: 1fr;
+    padding: 24px;
+    gap: 25px;
+  }
+  .regional-econ-hero h2 {
+    font-size: 31px;
+  }
+  .regional-purpose {
+    padding: 22px;
+  }
+  .regional-purpose > svg {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 15px;
+  }
+  .regional-formulas,
+  .regional-sources,
+  .regional-annual-volume {
+    grid-template-columns: 1fr;
+  }
+  .regional-formulas > .sq-card {
+    padding: 23px;
+  }
+  .regional-section-title h2 {
+    font-size: 21px;
+  }
+  .regional-section-title {
+    gap: 12px;
+  }
+  .regional-flow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .regional-flow > div {
+    padding: 20px 17px;
+  }
+  .regional-flow h3 {
+    font-size: 14px;
+  }
+  .regional-evidence-table th,
+  .regional-evidence-table td {
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+  .regional-evidence-table thead th:first-child {
+    width: 40%;
+  }
+  .regional-annual-volume {
+    padding: 25px;
+    gap: 25px;
+  }
+  .regional-annual-volume strong {
+    font-size: 66px;
+  }
+  .regional-annual-volume h2 {
+    font-size: 22px;
+  }
+  .regional-budget-status {
+    padding: 20px;
+  }
+}
